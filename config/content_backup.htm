@@ -23,4 +23,818 @@
 <p>2017 年 11 月 - <a href="https://pyslvs.github.io">https://pyslvs.github.io</a> 上線.</p>
 <p>2018 年 1 月 - 推出 <a href="https://github.com/KmolYuan/Pyslvs-UI/releases/tag/v18.01.0">18.01.0</a> 版, 自此改為以年月序作為版次.</p>
 <p>2018 年 7 月 - <a href="https://pyslvs.github.io/old">https://pyslvs.github.io/old</a> 使用手冊上線.</p>
+<p>2019 年 6 月 - Pyslvs-UI 正式<a href="https://kmolyuan.github.io/pyslvs-slide">發表</a> (<a href="https://kmolyuan.github.io/pyslvs-slide-en/">EN</a>), <a href="https://github.com/KmolYuan/pyslvs-paper-public/releases">Thesis</a>.</p>
 <p>2023 年 12 月 - <a href="https://pyslvs.github.io">https://pyslvs.github.io</a> 資料重新整理中.</p>
+<h2>Development</h2>
+<p><a href="https://nfuedu-my.sharepoint.com/:u:/g/personal/yen_nfu_edu_tw/EcYbwVPaDyRGpwxNWSRtRj4B7u9IzULS7MivyMAggtiNaQ?e=JGq4KB">Pyslvs_portable_development.7z</a> (需要下載密碼)</p>
+<p>啟動 Pyslvs portable development 可攜系統後, cd tmp 然後取下 Pyslvs-UI 原始碼:</p>
+<p>git clone --recurse-submodules <a href="https://github.com/pyslvs/Pyslvs-UI.git">https://github.com/pyslvs/Pyslvs-UI.git</a></p>
+<p>cd Pyslvs-UI</p>
+<p>pip install -e .</p>
+<p></p>
+<p></p><h1>MCAD</h1>
+<p>SolidWorks:</p>
+<p><a href="/downloads/block.SLDPRT">block.SLDPRT</a></p>
+<pre class="brush:py;auto-links:false;toolbar:false" contenteditable="false">import pythoncom
+import win32com.client
+import win32api
+import os
+ 
+os.system("taskkill /IM sldworks.exe /F")
+os.system("taskkill /IM sldworks_fs.exe /F")
+ 
+'''
+About DispatchEx and Dispatch Methods:
+https://stackoverflow.com/questions/18648933/using-pywin32-what-is-the-difference-between-dispatch-and-dispatchex
+Source code:
+http://pywin32.hg.sourceforge.net/hgweb/pywin32/pywin32/file/0db1b26904d5/com/win32com/src/PyIDispatch.cpp
+Doc:
+https://docs.microsoft.com/en-us/dotnet/standard/native-interop/com-callable-wrapper
+ 
+IDispatch: Provides a mechanism for late binding to type.
+IDispatchEx:
+    Interface supplied by the runtime if the class implements IExpando. The IDispatchEx interface is an extension of the IDispatch interface that, unlike IDispatch, enables enumeration, addition, deletion, and case-sensitive calling of members.
+'''
+app = win32com.client.DispatchEx("SldWorks.Application")
+#app=win32com.client.Dispatch("SldWorks.Application")
+ 
+# define var to convert variables
+def var(type, value):
+    # type needs to be string
+    # use builtin getattr() to return pythoncom.type
+    pytype = getattr(pythoncom, type)
+    return win32com.client.VARIANT(pytype, value)
+ 
+# for two-type variable convert
+# is there any three-type variant?
+def var2(type1, type2, value):
+    pytype1 = getattr(pythoncom, type1)
+    pytype2 = getattr(pythoncom, type2)
+    return win32com.client.VARIANT(pytype1|pytype2, value)
+     
+def part(app, fileName, sketchName, dimName, newDim, newFileName):
+    arg1 = var("VT_I4", 1)
+    # GetMassProperties( ((3, 1), (16387, 3)))
+    #arg1 = win32com.client.VARIANT(pythoncom.VT_I4, 1)
+    arg2 = var("VT_I4", -1)
+ 
+    # 0. need the most important obj app
+    #app=win32com.client.Dispatch("SldWorks.Application")
+    # use relative directory to open part
+    # 1. open part file, need the path of the part file (need the file name)
+    #doc=app.OpenDoc(".\\block2.SLDPRT", 1)
+    doc=app.OpenDoc(os.path.join(os.getcwd(), fileName), 1)
+    # save part as binary stl
+    # can we save part as ASCII stl as well?
+    #doc.SaveAs2(".\\block2.stl", 0, True, False)
+    # the parameter VARIANT list for SelectByID2
+    # can we automate the VARIANT conversion?
+    # 2. use the sketch to select the SKETCH (need the sketch name)
+    #SelectByID2((8, 1), (8, 1), (5, 1), (5, 1), (5, 1), (11, 1), (3, 1), (9, 1), (3, 1))
+    #arg3 = var("VT_BSTR", "Sketch1")
+    arg3 = var("VT_BSTR", sketchName)
+    arg4 = var("VT_BSTR", "SKETCH")
+    arg5 = var("VT_R8", 0)
+    arg6 = var("VT_R8", 0)
+    arg7 = var("VT_R8", 0)
+    arg8 = var("VT_BOOL", False)
+    arg9 = var("VT_I4", 0)
+    arg10 = var("VT_DISPATCH", None)
+    arg11 = var("VT_I4", 0)
+    # select Sketch1 first
+    status = doc.Extension.SelectByID2(arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11)
+    # select DIMENSION to to modify
+    # 3. use the dimension name @ sketch name @ part file name
+    # to select the DIMENSION to modify
+    #arg12 = var("VT_BSTR", "Width@Sketch1@block2.SLDPRT")
+    arg12 = var("VT_BSTR", dimName+"@"+sketchName+"@"+fileName)
+    arg13 = var("VT_BSTR", "DIMENSION")
+    status = doc.Extension.SelectByID2(arg12, arg13, arg5, arg6, arg7, arg8, arg9, arg10, arg11)
+    #Dim swDimension As SldWorks.Dimension
+    # 4. to bring out the parameter to modify, need the dimension name and 
+    # sketch name
+    #swDimension = doc.Parameter("Width@Sketch1")
+    swDimension = doc.Parameter(dimName+"@"+sketchName)
+    # the dimension unit is in meter
+    # 5. need the new value of the parameter
+    #swDimension.SystemValue = 0.50
+    swDimension.SystemValue = newDim
+    # 6. do the final house keeping process, clear selection and rebuild the part
+    sel = doc.ClearSelection2 
+    sel = True
+    status = doc.EditRebuild()
+    arg31 = var("VT_I4", 1)
+    arg32 = var2("VT_I4", "VT_BYREF", 3)
+    # 7. get the volume of the new part
+    volumn = doc.Extension.GetMassProperties(arg31, arg32)
+    #print(volumn[3]*1E9, "mm*3")
+    # 8. save the new part (need the new part file name)
+    #doc.SaveAs2(".\\block3.SLDPRT", 0, True, False)
+    doc.SaveAs2(os.path.join(os.getcwd(), "html/" + newFileName + ".SLDPRT"), 0, True, False)
+    # save jpg of part
+    doc.EditRebuild()
+    arg33 = var("VT_BSTR", "Isometric")
+    doc.ShowNamedView(arg33)
+    doc.ViewZoomtofit2()
+    doc.SaveAs3(os.path.join(os.getcwd(), "html/" + newFileName + ".jpg"), 0, 0)
+    # mm*3
+    return str(round(volumn[3]*1E9, 3)) + " mm*3"
+html = "以下零件採 SolidWorks 2017 SP 2.0 教育版繪製:&lt;br /&gt;&lt;br /&gt;&lt;table border='1' cellpadding='5'&gt;&lt;tr&gt;&lt;th&gt;Number&lt;/th&gt;&lt;th&gt;Part&lt;/th&gt;&lt;th&gt;Jpg&lt;/th&gt;&lt;th&gt;Width&lt;/th&gt;&lt;th&gt;Volume&lt;/th&gt;&lt;/tr&gt;"
+index = 0
+for i in range(1, 11):
+    dim = i*0.002
+    blockVolume = part(app, "31_step.SLDPRT", "Sketch1", "Width", dim, "31_" + str(i))
+    print("31_" + str(i) + ".SLDPRT, dim= " + str(round(dim, 3)) +", volume= " + blockVolume)
+    index += 1
+    newFileName = "31_" + str(i)
+    html += '''&lt;tr&gt;
+    &lt;td&gt;''' + str(index) +'''&lt;/td&gt;
+    &lt;td&gt;&lt;a href="./../downloads/sw_macro/html/''' + newFileName + '''.SLDPRT"&gt;''' + newFileName + '''.SLDPRT&lt;/a&gt;&lt;/td&gt;
+    &lt;td&gt;&lt;img width="300" src="./../downloads/sw_macro/html/''' + newFileName + '''.jpg"&gt;&lt;/img&gt;&lt;/td&gt;
+    &lt;td&gt;''' + str(round(dim*1000, 2)) + ''' mm &lt;/td&gt;
+    &lt;td&gt;''' + blockVolume + '''&lt;/td&gt;
+    &lt;/tr&gt;
+    '''
+html += "&lt;/table&gt;"
+# save part.html
+with open("./html/part.html", "w", encoding="utf-8") as f:
+     f.write(html)
+      
+'''
+for assembly
+        swModelDocExt.SelectByID2("", "EDGE", -0.439825991092107, 7.07350481263802E-02, 0.40982045578545, true, 2, null, 0);
+        swModelDocExt.SelectByID2("", "EDGE", -0.219003008311574, 0.073085842475507, 0.549481823985616, true, 4, null, 0);
+        swModelDocExt.SelectByID2("Part-3@AssemModel", "COMPONENT", 0, 0, 0, true, 1, null, 0);
+        swFeature = (Feature)swFeatureManager.FeatureLinearPattern2(3, 40 / 1000, 0, 0, false, true, "NULL", "NULL", false);
+        assemblyModel.ClearSelection2(true);
+'''
+os.system("taskkill /IM sldworks.exe /F")
+os.system("taskkill /IM sldworks_fs.exe /F")
+# now the SolidWorks is embedding</pre>
+<p>AutoDesk Inventor:</p>
+<pre class="brush:py;auto-links:false;toolbar:false" contenteditable="false">import pythoncom
+import win32com.client
+import win32api
+import os
+ 
+# Open Inventor
+invApp = win32com.client.Dispatch("Inventor.Application")
+#print(invApp)
+invApp.Visible = True
+ 
+invApp.SilentOperation = True
+ 
+# Set location of assembly
+partName = 'C:/tmp/Part1.ipt'
+ 
+# Open the model
+oDoc = invApp.Documents.Open(partName)
+# use UserParameters to access the user parameters
+#oUserParams = oDoc.ComponentDefinition.Parameters.UserParameters
+#oNewParam = oUserParams.AddByExpression("x", "9", "mm")
+# use Item() to get the model parameter named "d0"
+d0 = oDoc.ComponentDefinition.Parameters.Item("d0")
+# Expression can add dimension unit
+#d0.Expression = "2 cm"
+# Value use the default system unit: cm
+d0.Value = 2
+# use Update() method to get the new part volume
+oDoc.Update()
+# fit the active view and save the part image
+invApp.ActiveView.Fit(True)
+oDoc.SaveAs("C:/tmp/Part1.png", True)
+print(oDoc.ComponentDefinition.MassProperties.Volume)
+#invApp.Quit()</pre>
+<p>Siemens NX:</p>
+<p><a href="/downloads/block.prt">block.prt</a></p>
+<pre class="brush:py;auto-links:false;toolbar:false" contenteditable="false"># nx_open_part.py
+# 導入 NXOpen
+import NXOpen
+import NXOpen.UF
+import NXOpen.Gateway
+   
+def main():
+    # 取得目前開啟的工作階段
+    theSession = NXOpen.Session.GetSession()
+    theUfSession = NXOpen.UF.UFSession.GetUFSession()
+      
+    # 建立 ListingWindow
+    listWin= theSession.ListingWindow
+    # 開啟零件檔案
+    basePart1 = theSession.Parts.OpenBaseDisplay("c:/tmp/block.prt")
+    workPart = theSession.Parts.Work
+    unit1 = workPart.UnitCollection.FindObject("MilliMeter")
+    # height
+    p7 = workPart.Expressions.FindObject("p7")
+    # width
+    p8 = workPart.Expressions.FindObject("p8")
+    # length
+    p9 = workPart.Expressions.FindObject("p9")
+    workPart.Expressions.EditWithUnits(p7, unit1, "30")
+    workPart.Expressions.EditWithUnits(p8, unit1, "60")
+    workPart.Expressions.EditWithUnits(p9, unit1, "90")
+    theSession.UpdateManager.DoUpdate(0)
+    #saveStatus1 = workPart.SaveAs("c:/tmp/block_new.prt")
+    #saveStatus1.Dispose()
+    # initialize list to hold bodies
+    theBodyTags = []
+   
+    for x in workPart.Bodies:
+        if x.IsSolidBody:
+            theBodyTags.append(x.Tag)
+      
+    # 準備輸出 ASCII 格式 STL 零件檔案
+    sTLCreator1 = theSession.DexManager.CreateStlCreator()
+    sTLCreator1.AutoNormalGen = True
+    sTLCreator1.ChordalTol = 0.08
+    sTLCreator1.AdjacencyTol = 0.08
+    sTLCreator1.OutputFile = "C:\\tmp\\block_ascii.stl"
+    # Binary STL: NXOpen.STLCreatorOutputTypeEnum.Binary
+    sTLCreator1.OutputType = NXOpen.STLCreatorOutputTypeEnum.Text
+    # 已知 body1 命名
+    body1 = workPart.Bodies.FindObject("EXTRUDE(2)")
+    added1 = sTLCreator1.ExportSelectionBlock.Add(body1)
+    nXObject1 = sTLCreator1.Commit()
+    sTLCreator1.Destroy()
+  
+    # 開啟所建立的 ListingWindow
+    listWin.Open()
+    listWin.WriteLine("number of solid bodies: " + str(len(theBodyTags)))
+   
+    (massProps, Stats) = theUfSession.Modeling.AskMassProps3d(theBodyTags, len(theBodyTags), 1, 4, .03, 1, [0.99,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0])
+    listWin.WriteLine("units: kg, mm")
+    listWin.WriteLine("surface area: " + str(massProps[0]))
+    listWin.WriteLine("volume: " + str(massProps[1]*1E9))
+    # 在 ListingWindow 中寫入字串
+    listWin.WriteLine("Hello, NXOpen")
+    listWin.Close()
+     
+    # 將零件檔案 fit 之後, export 出 png 檔案
+    theUI = NXOpen.UI.GetUI()
+    imageExportBuilder1 = theUI.CreateImageExportBuilder()
+ 
+    custombackgroundcolor1 = [None] * 3
+    custombackgroundcolor1[0] = 1.0
+    custombackgroundcolor1[1] = 1.0
+    custombackgroundcolor1[2] = 1.0
+ 
+    imageExportBuilder1.SetCustomBackgroundColor(custombackgroundcolor1)
+    imageExportBuilder1.FileFormat = NXOpen.Gateway.ImageExportBuilder.FileFormats.Png
+    imageExportBuilder1.FileName = "c:\\tmp\\block.png"
+ 
+    imageExportBuilder1.BackgroundOption = NXOpen.Gateway.ImageExportBuilder.BackgroundOptions.Original
+ 
+    imageExportBuilder1.EnhanceEdges = False
+    imageExportBuilder1.RegionMode = False
+    # fit view 後 commit export png
+    workPart.ModelingViews.WorkView.Fit()
+    nXObject6 = imageExportBuilder1.Commit()
+ 
+    imageExportBuilder1.Destroy()
+      
+if __name__ == "__main__":
+    main()</pre><h2>Solid Edge</h2>
+<h4>SDK</h4>
+<p>The Solid Edge SDK provides developers with a range of tools and resources to create custom applications that interact with the Solid Edge software. The SDK includes documentation that covers the Solid Edge API, which provides access to the core functionality of the software. This allows developers to automate tasks, such as creating and modifying parts and assemblies, generating drawings and reports, and performing simulations and analyses.<br/><br/>The SDK also includes sample code and libraries that demonstrate how to use the API and provide a starting point for developing custom applications. These resources can help developers get up and running quickly and reduce the time it takes to create a working application.<br/><br/>One of the key benefits of using the Solid Edge SDK is the ability to support collaborative mechanical design processes. By creating custom applications that integrate with other tools and systems used in the design process, developers can help improve communication and collaboration between team members. This can help reduce errors, improve efficiency, and speed up the design process.</p>
+<p>For example, a developer could create an application that integrates Solid Edge with a project management tool. This could allow team members to share design data, track progress, and collaborate on tasks directly within the project management tool. This could help improve visibility into the design process and ensure that everyone is working from the same information.<br/><br/>Overall, the Solid Edge SDK provides developers with a powerful set of tools to create custom applications that extend the functionality of Solid Edge and improve its integration with other systems.</p>
+<p><a href="https://docs.plm.automation.siemens.com/docs/se/2020/api/webframe.html">Solid Edge 2020 SDK (siemens.com)</a></p>
+<p>如何透過 Python 重用 Windows TLB or OCX 等 DLL 動態連結程式庫</p>
+<p>pywin32: pip install pywin32</p>
+<p>就可以利用 python -m win32com.client.combrowse 瀏覽操作系統中的 COM 程式庫.</p>
+<p>若要將 Solid Edge Type library 轉為 .py, 執行 python -m win32com.client.makepy -i</p>
+<pre class="brush:js;auto-links:false;toolbar:false" contenteditable="false">Y:\&gt;python -m win32com.client.makepy -i
+Solid Edge Geometry Type Library
+ {3E2B3BE1-F0B9-11D1-BDFD-080036B4D502}, lcid=0, major=1, minor=0
+ &gt;&gt;&gt; # Use these commands in Python code to auto generate .py support
+ &gt;&gt;&gt; from win32com.client import gencache
+ &gt;&gt;&gt; gencache.EnsureModule('{3E2B3BE1-F0B9-11D1-BDFD-080036B4D502}', 0, 1, 0)</pre>
+<p>接著利用 Python 程式執行, 列出轉為 .py 後的 Type Library 所在位置:</p>
+<pre class="brush:py;auto-links:false;toolbar:false" contenteditable="false">from win32com.client import gencache
+ 
+geom_type_lib = gencache.EnsureModule('{3E2B3BE1-F0B9-11D1-BDFD-080036B4D502}', 0, 1, 0)
+print(dir(geom_type_lib))
+print(repr(geom_type_lib))</pre>
+<p>執行後可以取得 Solid Edge Geometry Type Library 轉出 .py 後的檔案所在目錄:</p>
+<p>&lt;module 'win32com.gen_py.3E2B3BE1-F0B9-11D1-BDFD-080036B4D502x0x1x0' from 'C:\\Users\\pj2023\\AppData\\Local\\Temp\\gen_py\\3.11\\3E2B3BE1-F0B9-11D1-BDFD-080036B4D502x0x1x0.py'&gt;</p>
+<p>Python for Solid Edge API example:</p>
+<pre class="brush:py;auto-links:false;toolbar:false" contenteditable="false">import win32com.client
+import os
+import random
+import string
+  
+def password_generator(size=4, chars=string.ascii_lowercase + string.digits):
+  
+    """Generate random password
+    """
+    return ''.join(random.choice(chars) for _ in range(size))
+  
+pass_string = "abcdefghkmnpqrstuwxyz123456789"
+#for i in range(10):
+    #print(password_generator(4, pass_string))
+ 
+new_part_name = password_generator(4, pass_string)
+ 
+# Connect to a running instance of Solid Edge
+application = win32com.client.Dispatch("SolidEdge.Application")
+ 
+# Get the documents collection
+documents = application.Documents
+ 
+# Set the path to the part file
+part_file_path = os.path.join(os.getcwd(), "Part1.par")
+ 
+# Open the part file
+part = documents.Open(part_file_path)
+#print(dir(part))
+ 
+# Get the models collection
+models = part.Models
+#print(dir(models))
+ 
+# Get the first model in the collection
+model = models.Item(1)
+#print(dir(model))
+ 
+document = model.Document
+#print(dir(document))
+ 
+variables = document.Variables
+ 
+# Get the variable you want to modify
+width = variables.Item("Width")
+length = variables.Item("Length")
+height = variables.Item("Height")
+ 
+# Set the new value for the variable in meter?
+ 
+length.Value = random.SystemRandom().uniform(0.1, 0.3)
+width.Value = random.SystemRandom().uniform(0.1, 0.3)
+height.Value = random.SystemRandom().uniform(0.1, 0.3)
+ 
+# Update the model to reflect the changes
+#document.UpdateOnFileSave = True
+model.Recompute()
+ 
+# Set the path for the new file
+new_file_path = os.path.join(os.getcwd(), new_part_name + ".par")
+ 
+# Save the modified part to a new file
+document.SaveAs(new_file_path)</pre>
+<p>Modify assembly variables:</p>
+<pre class="brush:py;auto-links:false;toolbar:false" contenteditable="false">import win32com.client
+ 
+# Connect to a running instance of Solid Edge
+application = win32com.client.Dispatch("SolidEdge.Application")
+ 
+# Get the active assembly document
+assembly_document = application.ActiveDocument
+ 
+# Get the first occurrence in the assembly
+occurrence = assembly_document.Occurrences.Item(1)
+ 
+# Get the part document associated with the occurrence
+part_document = occurrence.OccurrenceDocument
+ 
+# Get the variables collection of the part document
+variables = part_document.Variables
+ 
+# Get a specific variable by its name
+variable = variables.Item("VariableName")
+ 
+# Modify the value of the variable
+variable.Value = 10
+ 
+# Update the assembly
+assembly_document.Update()
+</pre>
+<p>Flask and Solid Edge:</p>
+<pre class="brush:py;auto-links:false;toolbar:false" contenteditable="false">from flask import Flask, render_template, request
+import win32com.client
+ 
+app = Flask(__name__)
+ 
+# Constants
+filename = 'C:\\Path\\To\\YourFile.par'
+ 
+@app.route('/', methods=['GET', 'POST'])
+def index():
+    if request.method == 'POST':
+        new_length = float(request.form['length'])
+ 
+        # Start Solid Edge
+        application = win32com.client.Dispatch('SolidEdge.Application')
+ 
+        # Open the document
+        document = application.Documents.Open(filename)
+ 
+        # Get the variables collection
+        variables = document.Variables
+ 
+        # Get the length variable
+        length_variable = variables.Item('Length')
+ 
+        # Set the new value
+        length_variable.Value = new_length
+ 
+        # Update the document
+        document.Update()
+ 
+        # Get the models collection
+        models = document.Models
+ 
+        # Get the first model
+        model = models.Item(1)
+ 
+        # Calculate the volume
+        volume = model.ComputePhysicalProperties().Volume
+ 
+        # Save the document
+        document.Save()
+ 
+        # Close the document
+        document.Close()
+ 
+        return render_template('index.html', volume=volume)
+    else:
+        return render_template('index.html')
+ 
+if __name__ == '__main__':
+    app.run()</pre>
+<p>index.html</p>
+<pre class="brush:html;auto-links:false;toolbar:false" contenteditable="false">&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+    &lt;head&gt;
+        &lt;title&gt;Solid Edge API&lt;/title&gt;
+    &lt;/head&gt;
+    &lt;body&gt;
+        &lt;form method="post"&gt;
+            &lt;label for="length"&gt;Length:&lt;/label&gt;
+            &lt;input type="text" id="length" name="length"&gt;
+            &lt;input type="submit" value="Submit"&gt;
+        &lt;/form&gt;
+        {% if volume %}
+            &lt;p&gt;New volume: {{ volume }}&lt;/p&gt;
+        {% endif %}
+    &lt;/body&gt;
+&lt;/html&gt;</pre>
+<p>Create Part by api:</p>
+<pre class="brush:py;auto-links:false;toolbar:false" contenteditable="false">import win32com.client
+ 
+# Constants
+filename = 'C:\\tmp\\new.par'
+material_name = 'Steel'
+ 
+# Start Solid Edge
+application = win32com.client.Dispatch('SolidEdge.Application')
+ 
+# Create a new part document
+document = application.Documents.Add('SolidEdge.PartDocument')
+# Get the ref planes collection
+ref_planes = document.RefPlanes
+'''
+# Define the points
+point1 = (0, 0, 0)
+point2 = (100, 0, 0)
+point3 = (0, 100, 0)
+ 
+# Add the reference plane
+ref_plane = ref_planes.AddBy3Points(point1, point2, point3)
+'''
+# Get the profile sets collection
+profile_sets = document.ProfileSets
+ 
+# Add a new profile set
+objProfile = profile_sets.Add()
+ 
+ 
+objP1 = objProfile.Points2d.Add(0, 0)
+ 
+ 
+objP2 = objProfile.Points2d.Add(0.01, 0)
+ 
+objP3 = objProfile.Points2d.Add(0, 0.01)
+ 
+objEdgeSet[0] = objP1
+ 
+ 
+objEdgeSet[1] = objP2
+ 
+objEdgeSet[2] = objP3
+objkeyPoints[0] = SolidEdgeConstants.KeyPointType.igKeyPointStart
+ 
+ 
+objkeyPoints[1] = SolidEdgeConstants.KeyPointType.igKeyPointMiddle
+ 
+objkeyPoints[2] = SolidEdgeConstants.KeyPointType.igKeyPointEnd
+ 
+objNumEdges = 3
+ 
+objRPNTC = document.RefPlanes.AddBy3Points(objNumEdges, objEdgeSet, objkeyPoints)
+ 
+ 
+objRPNTC.Visible = True
+# Save the document
+document.Save()
+ 
+# Close the document
+document.Close()
+'''
+# Get the profile sets collection
+profile_sets = document.ProfileSets
+ 
+# Add a new profile set
+profile_set = profile_sets.Add()
+ 
+# Get the profiles collection
+profiles = profile_set.Profiles
+ 
+#print(dir(profiles))
+ 
+application.DoIdle()
+ 
+#Get a reference to the RefPlanes collection.
+refPlanes = document.RefPlanes
+print(dir(refPlanes))
+ 
+#Get a reference to front RefPlane.
+refPlane = refPlanes.GetFrontPlane()
+ 
+# Add a new profile
+profile = profiles.AddRef()
+ 
+# Get the lines2d collection
+lines2d = profile.Lines2d
+ 
+# Draw a rectangle
+line1 = lines2d.AddBy2Points(0, 0, 100, 0)
+line2 = lines2d.AddBy2Points(100, 0, 100, 10)
+line3 = lines2d.AddBy2Points(100, 10, 0, 10)
+line4 = lines2d.AddBy2Points(0, 10, 0, 0)
+ 
+# Define the profile as closed
+profile.End(ProfileEndCap.Round)
+ 
+# Get the models collection
+models = document.Models
+ 
+# Create an extruded protrusion
+extruded_protrusion = models.AddProtrusionExtruded(profile_set, ProfilePlaneSide.PlaneSidePositive, ProfileEndCap.Round, 100)
+ 
+# Get the materials collection
+materials = document.Materials
+ 
+# Get the steel material
+material = materials.Item(material_name)
+ 
+# Set the material of the model
+model = models.Item(1)
+model.Material = material
+ 
+# Save the document
+document.SaveAs(filename)
+ 
+# Close the document
+document.Close()
+'''</pre>
+<p>get part volume and save:</p>
+<pre class="brush:py;auto-links:false;toolbar:false" contenteditable="false">import win32com.client
+ 
+# Constants
+filename = 'C:\\Path\\To\\YourFile.par'
+new_length = 100.0
+ 
+# Start Solid Edge
+application = win32com.client.Dispatch('SolidEdge.Application')
+ 
+# Open the document
+document = application.Documents.Open(filename)
+ 
+# Get the variables collection
+variables = document.Variables
+ 
+# Get the length variable
+length_variable = variables.Item('Length')
+ 
+# Set the new value
+length_variable.Value = new_length
+ 
+# Update the document
+document.Update()
+ 
+# Get the models collection
+models = document.Models
+ 
+# Get the first model
+model = models.Item(1)
+ 
+# Calculate the volume
+volume = model.ComputePhysicalProperties().Volume
+ 
+# Save the document
+document.Save()
+ 
+# Close the document
+document.Close()
+ 
+print(f'New volume: {volume}')</pre>
+<p>Assembly example:</p>
+<pre class="brush:py;auto-links:false;toolbar:false" contenteditable="false">import win32com.client
+import os
+ 
+# Connect to a running instance of Solid Edge
+application = win32com.client.Dispatch("SolidEdge.Application")
+ 
+# Get the documents collection
+documents = application.Documents
+ 
+# Set the path to the part file
+assem_file_path = os.path.join(os.getcwd(), "Assem1.par")
+ 
+# Open the part file
+assembly= documents.Open(assem_file_path)
+#print(dir(assembly))
+ 
+# Get the occurrences collection
+occurrences = assembly.Occurrences
+ 
+# Get the first occurrence in the collection
+occurrence = occurrences.Item(1)
+ 
+document = occurrence.Document
+ 
+# Get the variables collection
+variables = document.Variables
+ 
+# Get the variable you want to modify
+my_variable = variables.Item("MyVariable")
+ 
+# Set the new value for the variable
+my_variable.Value = 50
+ 
+# Update the model to reflect the changes
+document.UpdateOnFileSave = True
+ 
+# Set the path for the new file
+new_file_path = os.path.join(os.getcwd(), "newAssem1.par")</pre>
+<p>api cube with random new part filename:</p>
+<pre class="brush:py;auto-links:false;toolbar:false" contenteditable="false">import win32com.client
+import os
+import random
+import string
+  
+def password_generator(size=4, chars=string.ascii_lowercase + string.digits):
+  
+    """Generate random password
+    """
+    return ''.join(random.choice(chars) for _ in range(size))
+  
+pass_string = "abcdefghkmnpqrstuwxyz123456789"
+#for i in range(10):
+    #print(password_generator(4, pass_string))
+ 
+new_part_name = password_generator(4, pass_string)
+ 
+# Connect to a running instance of Solid Edge
+application = win32com.client.Dispatch("SolidEdge.Application")
+ 
+# Get the documents collection
+documents = application.Documents
+ 
+# Set the path to the part file
+part_file_path = os.path.join(os.getcwd(), "Part1.par")
+ 
+# Open the part file
+part = documents.Open(part_file_path)
+#print(dir(part))
+ 
+# Get the models collection
+models = part.Models
+#print(dir(models))
+ 
+# Get the first model in the collection
+model = models.Item(1)
+#print(dir(model))
+ 
+document = model.Document
+#print(dir(document))
+ 
+variables = document.Variables
+ 
+# Get the variable you want to modify
+width = variables.Item("Width")
+length = variables.Item("Length")
+height = variables.Item("Height")
+ 
+# Set the new value for the variable in meter?
+ 
+length.Value = random.SystemRandom().uniform(0.1, 0.3)
+width.Value = random.SystemRandom().uniform(0.1, 0.3)
+height.Value = random.SystemRandom().uniform(0.1, 0.3)
+ 
+# Update the model to reflect the changes
+#document.UpdateOnFileSave = True
+model.Recompute()
+ 
+# Set the path for the new file
+new_file_path = os.path.join(os.getcwd(), new_part_name + ".par")
+ 
+# Save the modified part to a new file
+document.SaveAs(new_file_path)</pre>
+<p>Create Extrusion:</p>
+<p>python -m win32com.client.makepy to interactively generate SolidEdgePart.py in C:\Users\Account\AppData\Local\Temp\gen_py\3.11</p>
+<p><a href="https://nfuedu-my.sharepoint.com/:u:/g/personal/yen_nfu_edu_tw/EdIojU-TIEZOqAkpm4OCB5wBKo-XipJQ-t_LJ8-8eXCuJw?e=fGrOaQ">SolidEdgePart_create_extrusion_example.7z</a> (for Solid Edge version 2210 and downloaded for @nfu users only)</p>
+<pre class="brush:py;auto-links:false;toolbar:false" contenteditable="false">import win32com.client
+import SolidEdgePart
+ 
+# Start Solid Edge
+application = win32com.client.Dispatch("SolidEdge.Application")
+ 
+# Make the application visible
+application.Visible = True
+ 
+# Create a new part document
+partDocument = application.Documents.Add("SolidEdge.PartDocument")
+ 
+# Get the refPlanes collection
+refPlanes = partDocument.RefPlanes
+ 
+# Get the top plane
+topPlane = refPlanes.Item(3)
+ 
+# Add a new sketch on the top plane
+sketch = partDocument.Sketches.AddByPlane(topPlane)
+ 
+# Get the profile
+profile = sketch.Profiles.Add(topPlane)
+ 
+# Draw a circle with center at (0,0) and radius 0.05
+circle = profile.Circles2d.AddByCenterRadius(0, 0, 0.05)
+ 
+# Close the profile
+profile.End(2)
+ 
+# Define the extrusion parameters
+extrusionDistance = "0.1"
+extrusionDirection = SolidEdgePart.constants.igRight
+ 
+# Create the extrusion using AddFiniteExtrudedProtrusion
+extrusion = partDocument.Models.AddFiniteExtrudedProtrusion(1, [profile], extrusionDirection, extrusionDistance)
+ 
+# Save the part file
+partDocument.SaveAs(r"C:\Path\To\PartFile.par")</pre>
+<pre class="brush:py;auto-links:false;toolbar:false" contenteditable="false">import win32com.client
+import SolidEdgePart
+ 
+# Start Solid Edge
+application = win32com.client.Dispatch("SolidEdge.Application")
+ 
+# Make the application visible
+application.Visible = True
+ 
+# Create a new part document
+partDocument = application.Documents.Add("SolidEdge.PartDocument")
+ 
+# Get the refPlanes collection
+refPlanes = partDocument.RefPlanes
+ 
+# Get the top plane
+topPlane = refPlanes.Item(3)
+ 
+# Add a new sketch on the top plane
+sketch = partDocument.Sketches.AddByPlane(topPlane)
+ 
+# Get the profile
+profile = sketch.Profiles.Add(topPlane)
+ 
+# Draw the outer rectangle of the link using four lines
+line1 = profile.Lines2d.AddBy2Points(-0.1, -0.05, 0.1, -0.05)
+line2 = profile.Lines2d.AddBy2Points(0.1, -0.05, 0.1, 0.05)
+line3 = profile.Lines2d.AddBy2Points(0.1, 0.05, -0.1, 0.05)
+line4 = profile.Lines2d.AddBy2Points(-0.1, 0.05, -0.1, -0.05)
+ 
+# Draw the first hole
+circle1 = profile.Circles2d.AddByCenterRadius(-0.05, 0, 0.02)
+ 
+# Draw the second hole
+circle2 = profile.Circles2d.AddByCenterRadius(0.05, 0, 0.02)
+ 
+# Close the profile
+profile.End(2) # 2 corresponds to igProfileClosed
+ 
+# Define the extrusion parameters
+extrusionDistance = 0.1
+extrusionDirection = SolidEdgePart.constants.igRight
+ 
+# Create the extrusion using AddFiniteExtrudedProtrusion
+extrusion = partDocument.Models.AddFiniteExtrudedProtrusion(1, [profile], extrusionDirection, extrusionDistance)
+ 
+# fix according to https://community.sw.siemens.com/s/question/0D54O000061xsuMSAQ/circle-extrusion-problem</pre>
+<p>參考:</p>
+<p style="padding-left: 30px;"><a href="https://nfuedu-my.sharepoint.com/:b:/g/personal/yen_nfu_edu_tw/EZLh-WxUQalCsEevZZYg5j4BWKeqLa1CkTukFFg7yyIArA?e=nctqWp">Solid Edge Programming Guide.pdf</a> (for @nfu users only)</p>
+<p style="padding-left: 30px;"><a href="https://nfuedu-my.sharepoint.com/:u:/g/personal/yen_nfu_edu_tw/EcRdddi5q7NBtwfVidgXoRUBmakACONd_q1xuUAzWZmdkg?e=8WmybY">Solid Edge Type Library for Python.7z</a> (for @nfu users only)</p>
+<h1>References</h1>
+<p>PMKS: <a href="https://github.com/DesignEngrLab/PMKS">https://github.com/DesignEngrLab/PMKS</a></p>
+<p>PMKS+: <a href="https://app.pmksplus.com/">https://app.pmksplus.com/</a></p>
+<p style="padding-left: 30px;"><a href="https://digital.wpi.edu/concern/file_sets/5712m911h">PMKS+: Recreating a Legacy Application</a></p>
+<p>MotionGen: <a href="https://motiongen.io/">https://motiongen.io/</a></p>
+<p><a href="https://github.com/ziceptor/Pyslvs-PyQt5">https://github.com/ziceptor/Pyslvs-PyQt5</a> </p>
