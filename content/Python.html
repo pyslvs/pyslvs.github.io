@@ -2,7 +2,7 @@
         <head>
         <title>pyslvs</title>
         <meta charset="utf-8">
-<meta property="head" content="H2">
+<meta property="head" content="H3">
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
         <link href="https://fonts.googleapis.com/css?family=Quicksand:300,400,500,700,900" rel="stylesheet">
         <link rel="stylesheet" href="./../cmsimde/static/chimper/fonts/icomoon/style.css">
@@ -142,21 +142,43 @@ img.add_border {
           </div>
           
         </header>
-    <div id="tipue_search_content">Development << <a href='Development.html'>Previous</a> <a href='MCAD.html'>Next</a> >> MCAD<br /><h1>Pyinstaller</h1>
-<p>Under Pyslvs portable development environment, use the following batch file to generate standalone Pyslvs-UI/dist/Pyslvs.exe:</p>
-<p><a href="./../downloads/win_generate_exe.bat">win_generate_exe.bat</a></p>
-<pre class="brush:js;auto-links:false;toolbar:false" contenteditable="false">REM batch file to generate Pyslvs.exe
-set Disk=y
-
-for /f %%v in ('python -c "from pyslvs_ui import __version__;print(__version__)"') do set "PYSLVSVER=%%v"
-for /f %%v in ('python -c "import platform;print(''.join(platform.python_compiler().split()[:2]).replace('.', '').lower())"') do set "COMPILERVER=%%v"
-for /f %%v in ('python -c "import platform;print(platform.machine().lower())"') do set "SYSVER=%%v"
-set "EXENAME=pyslvs-%PYSLVSVER%.%COMPILERVER%-%SYSVER%"
-
-python -m PyInstaller -c -F "%Disk%:/tmp/Pyslvs-UI/scripts/entry.py" -n %EXENAME% -i "pyslvs_ui/icons/main.ico"  --add-data "pyslvs_ui/icons/*;pyslvs_ui/icons" --additional-hooks-dir "%Disk%:/tmp/Pyslvs-UI/scripts"</pre>
-<p>y:\tmp\Pyslvs-UI&gt;win_generate_exe.bat</p>
-<p></p>
-<br />Development << <a href='Development.html'>Previous</a> <a href='MCAD.html'>Next</a> >> MCAD</div>
+    <div id="tipue_search_content">GIT << <a href='GIT.html'>Previous</a> <a href='SciTE.html'>Next</a> >> SciTE<br /><h1>Python</h1>
+<p>使用舊版 Python 建立新版的可攜程式系統:</p>
+<p>Python 各版本檔案: <a href="https://www.python.org/ftp/python/">https://www.python.org/ftp/python/</a></p>
+<p>請注意: Python 3.12.0 沒有 tools.msi</p>
+<p><a href="https://www.bing.com/ck/a?!&amp;&amp;p=91ef2cbcb9cc640eJmltdHM9MTY5NzY3MzYwMCZpZ3VpZD0zYTQ3ZGJlMS1lOGQ4LTZkNDktMjYyNy1jODk3ZTk0YzZjMDcmaW5zaWQ9NTIyMA&amp;ptn=3&amp;hsh=3&amp;fclid=3a47dbe1-e8d8-6d49-2627-c897e94c6c07&amp;psq=get+pip&amp;u=a1aHR0cHM6Ly9naXRodWIuY29tL3B5cGEvZ2V0LXBpcA&amp;ntb=1">get-pip.py</a></p>
+<p>generate_portable_python.py</p>
+<pre class="brush:py;auto-links:false;toolbar:false" contenteditable="false">import urllib.request
+import os
+ 
+dir_path = os.path.dirname(os.path.realpath(__file__))
+# basic files for Python installation
+# before 3.12.0
+#py_list = ["core", "dev", "exe", "lib", "tcltk", "tools"]
+# 3.12.0 no tools.msi
+py_list = ["core", "dev", "exe", "lib", "tcltk"]
+# Python version
+version = "3.12.0"
+# Python msi download URL
+ftp = "https://www.python.org/ftp/python/" + version + "/amd64/"
+# location for Portable Python
+path = "y:\\tmp\\Python312"
+# create directory
+try:
+    os.mkdir(path)
+except:
+    # path exists
+    pass
+# get Python installation msi files and extract into target dir
+for i in py_list:
+    filename = i + ".msi"
+    url = ftp + filename
+    # download basic python msi file
+    urllib.request.urlretrieve(url, filename)
+    os.system("msiexec.exe /a " + i + ".msi targetdir=" + path)
+    # delete msi file
+    os.remove(dir_path + "\\" + i + ".msi")</pre>
+<p></p><br />GIT << <a href='GIT.html'>Previous</a> <a href='SciTE.html'>Next</a> >> SciTE</div>
         
     <!-- footer -->
       <div class="container">

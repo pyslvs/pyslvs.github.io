@@ -1,9 +1,17 @@
 <h1>About</h1>
-<p><a href="https://pyslvs.github.io">https://pyslvs.github.io</a> 為支援 <a href="https://mde.tw/pj4101">https://mde.tw/pj4101</a> 專案用的開發網站, Pyslvs-UI 的 Official 開發倉儲如下:</p>
+<p><a href="https://pyslvs.github.io">https://pyslvs.github.io</a> 為支援 <a href="https://mde.tw/pj4101">https://mde.tw/pj4101</a> 專案用的開發網站, Pyslvs-UI 的 Official 開發倉儲如下:</p>
 <p style="padding-left: 30px;">Pyslvs-UI Official site: <a href="https://github.com/KmolYuan/Pyslvs-UI">https://github.com/KmolYuan/Pyslvs-UI</a></p>
 <p style="padding-left: 30px;">Pyslvs Official site: <a href="https://github.com/KmolYuan/pyslvs">https://github.com/KmolYuan/pyslvs</a></p>
 <p style="padding-left: 30px;">Metaheuristics Official site: <a href="https://github.com/KmolYuan/metaheuristics">https://github.com/KmolYuan/metaheuristics</a></p>
 <p><a href="https://pyslvs.github.io">https://pyslvs.github.io</a> 的 Pyslvs-UI 開發倉儲位於 <a href="https://github.com/pyslvs/Pyslvs-UI">https://github.com/pyslvs/Pyslvs-UI</a> 最新 Release 為 <a href="https://github.com/pyslvs/Pyslvs-UI/releases/tag/v23.12.0">v23.12.0</a></p>
+<p><a href="https://pyslvs.github.io">https://pyslvs.github.io</a> 的目標如下:</p>
+<ol>
+<li>簡化有關 Pyslvs-UI 在 Windows 64 位元操作系統中的開發流程</li>
+<li>將 Pyslvs-UI 的機構轉為 <a href="https://resources.sw.siemens.com/en-US/download-solid-edge-community-edition">Solid Edge Community Version</a> 零組件</li>
+<li>將 Pyslvs-UI 的機構轉為 <a href="https://www.coppeliarobotics.com/">CoppeliaSim</a> 與 <a href="https://cyberbotics.com/">Webots</a> 模擬場景</li>
+<li>將 Pyslvs-UI 的機構轉為 <a href="https://github.com/PMKS-Web/PMKSWeb">PMKSPlus</a> 網際系統格式</li>
+<li>將<a href="https://en.wikipedia.org/wiki/Reinforcement_learning">強化學習機制</a>導入 Pyslvs-UI 機構設計流程</li>
+</ol>
 <p></p><h1>Pyslvs-UI</h1>
 <p>Old data: <a href="https://pyslvs.github.io/old">https://pyslvs.github.io/old</a></p>
 <p><a href="https://github.com/KmolYuan/Pyslvs-UI">Pyslvs-UI</a> 的開發源自 2008 年, 從最基本的實數基因演算法在平面機構的應用研究起步, 期間歷經下列研究者的貢獻:</p>
@@ -860,7 +868,143 @@ extrusion = partDocument.Models.AddFiniteExtrudedProtrusion(1, [profile], extrus
 <p>參考:</p>
 <p style="padding-left: 30px;"><a href="https://nfuedu-my.sharepoint.com/:b:/g/personal/yen_nfu_edu_tw/EZLh-WxUQalCsEevZZYg5j4BWKeqLa1CkTukFFg7yyIArA?e=nctqWp">Solid Edge Programming Guide.pdf</a> (for @nfu users only)</p>
 <p style="padding-left: 30px;"><a href="https://nfuedu-my.sharepoint.com/:u:/g/personal/yen_nfu_edu_tw/EcRdddi5q7NBtwfVidgXoRUBmakACONd_q1xuUAzWZmdkg?e=8WmybY">Solid Edge Type Library for Python.7z</a> (for @nfu users only)</p>
-<h1>References</h1>
+<h1>Tasks</h1>
+<p><a href="https://pyslvs.github.io">https://pyslvs.github.io</a> 的目標如下:</p>
+<ol>
+<li>簡化有關 Pyslvs-UI 在 Windows 64 位元操作系統中的開發流程</li>
+<li>將 Pyslvs-UI 的機構轉為 <a href="https://resources.sw.siemens.com/en-US/download-solid-edge-community-edition">Solid Edge Community Version</a> 零組件</li>
+<li>將 Pyslvs-UI 的機構轉為 <a href="https://www.coppeliarobotics.com/">CoppeliaSim</a> 與 <a href="https://cyberbotics.com/">Webots</a> 模擬場景</li>
+<li>將 Pyslvs-UI 的機構轉為 <a href="https://github.com/PMKS-Web/PMKSWeb">PMKSPlus</a> 網際系統格式</li>
+<li>將<a href="https://en.wikipedia.org/wiki/Reinforcement_learning">強化學習機制</a>導入 Pyslvs-UI 機構設計流程</li>
+</ol>
+<h2>Windows</h2>
+<p><a href="https://pyslvs.github.io">https://pyslvs.github.io</a> 的第一個目標為:</p>
+<p style="padding-left: 30px;">簡化有關 Pyslvs-UI 在 Windows 64 位元操作系統中的開發流程</p>
+<p>建立一個 Windows 64 位元操作系統中的可攜程式套件:</p>
+<p style="padding-left: 30px;"><a href="https://nfuedu-my.sharepoint.com/:u:/g/personal/yen_nfu_edu_tw/EcYbwVPaDyRGpwxNWSRtRj4B7u9IzULS7MivyMAggtiNaQ?e=JGq4KB">Pyslvs_portable_development.7z</a> (需要下載密碼)</p>
+<p>Pyslvs portable development 套件包含下列工具:</p>
+<p>MSYS2: <a href="https://www.msys2.org/">https://www.msys2.org/</a></p>
+<p>GIT: 64 位元 portable Git <a href="https://git-scm.com/download/win">https://git-scm.com/download/win</a></p>
+<p>Python: <a href="https://www.python.org/">https://www.python.org/</a></p>
+<p>SciTE: <a href="https://www.scintilla.org/SciTEDownload.html">https://www.scintilla.org/SciTEDownload.html</a></p>
+<p>可攜程式系統啟動與關閉批次檔案:</p>
+<p>start.bat</p>
+<pre class="brush:js;auto-links:false;toolbar:false" contenteditable="false">@echo off
+set Disk=y
+subst %Disk%: "data"
+ 
+%Disk%:
+ 
+set HomePath=%Disk%:\home
+set HomeDrive=%Disk%:\home
+set Home=%Disk%:\home
+set USERPROFILE=%Disk%:\home
+ 
+REM 將系統 Python 程式的 io 設為 utf-8
+set PYTHONIOENCODING="utf-8"
+ 
+set PYTHONPATH=%Disk%:\Python311\DLLs;%Disk%:\Python311\Lib;%Disk%:\Python311\Lib\site-packages;
+set PYTHONHOME=%Disk%:\Python311
+
+set LOCALAPPDATA=%Disk%:\home\AppData\
+set TEMP=%LOCALAPPDATA%\Local\Temp
+set TMP=%LOCALAPPDATA%\Local\Temp
+ 
+REM for putty
+set GIT_SSH=%Disk%:\putty\plink.exe
+ 
+REM 設定跟 Python 有關的命令搜尋路徑
+set path_python=%Disk%:\Python311;%Disk%:\Python311\Scripts;
+REM 設定跟Git 有關的命令搜尋路徑
+set path_git=%Disk%:\portablegit\bin;
+REM 設定 msys2 64 位元的執行路徑
+set path_msys2=%Disk%:\msys64_20230718\mingw64\bin;
+set path_lua=%Disk%:\lua-5.3.5\;
+set path_cmake=%Disk%:\cmake-3.21.0-windows-x86_64\bin;
+set path_tcc=%Disk%:\tcc;
+set path_gnuplot=%Disk%:\gnuplot\bin;
+REM for execute scite directly
+set path_scite=%Disk%:\wscite;
+set path_miktex=%Disk%:\miktex-portable\texmfs\install\miktex\bin\x64;
+REM old swig 4.0.0
+set path_swig=%Disk%:\swigwin-4.1.1;
+REM for free pascal
+set path_freepascal=%Disk%:\FPC\3.2.2\bin\i386-win32
+
+REM Xcopy %Disk%:\home\AppData\Roaming\Coppeliasim C:\users\%USERNAME%\AppData\Roaming\Coppeliasim /E /H /C /I /Y
+ 
+path=%Disk%:;%path_python%;%path_msys2%;%path_cmake%;%path_lua%;%path_git%;%path_tcc%;%path_gnuplot%;%path_scite%;%path_miktex%;%path_swig%;%path_freepascal%;%path%;
+ 
+start /MIN cmd.exe
+start /MIN cmd.exe
+start /MIN cmd.exe
+start /MIN cmd.exe
+ 
+start /MIN %Disk%:\wscite\SciTE.exe
+start /MIN %Disk%:\wscite\SciTE.exe
+
+REM start %Disk%:\Webots\msys64\mingw64\bin\webotsw.exe
+
+REM start %Disk%:\miktex-portable\texmfs\install\miktex\bin\x64\miktex-console.exe --hide --mkmaps
+ 
+ 
+Exit</pre>
+<p>stop.bat</p>
+<pre class="brush:js;auto-links:false;toolbar:false" contenteditable="false">@echo off
+set Disk=y
+path=%PATH%;
+ 
+taskkill /IM python.exe /F
+taskkill /IM pythonw.exe /F
+taskkill /IM scite.exe /F
+taskkill /IM pyslvs.exe /F
+ 
+REM 終止虛擬硬碟與目錄的對應
+subst %Disk%: /D
+REM 關閉 cmd 指令視窗
+taskkill /IM cmd.exe /F
+ 
+EXIT</pre>
+<p></p><h3>MSYS2</h3>
+<p>下載 <a href="https://github.com/msys2/msys2-installer/releases/download/2023-10-26/msys2-x86_64-20231026.exe">https://github.com/msys2/msys2-installer/releases/download/2023-10-26/msys2-x86_64-20231026.exe</a> 之後, 解開壓縮檔案取得 msys64_20231026 目錄.</p><h3>GIT</h3>
+<p>下載 <a href="https://git-scm.com/download/win">https://git-scm.com/download/win</a> 中的 Portablegit.</p><h3>Python</h3>
+<p>使用舊版 Python 建立新版的可攜程式系統:</p>
+<p>Python 各版本檔案: <a href="https://www.python.org/ftp/python/">https://www.python.org/ftp/python/</a></p>
+<p>請注意: Python 3.12.0 沒有 tools.msi</p>
+<p><a href="https://www.bing.com/ck/a?!&amp;&amp;p=91ef2cbcb9cc640eJmltdHM9MTY5NzY3MzYwMCZpZ3VpZD0zYTQ3ZGJlMS1lOGQ4LTZkNDktMjYyNy1jODk3ZTk0YzZjMDcmaW5zaWQ9NTIyMA&amp;ptn=3&amp;hsh=3&amp;fclid=3a47dbe1-e8d8-6d49-2627-c897e94c6c07&amp;psq=get+pip&amp;u=a1aHR0cHM6Ly9naXRodWIuY29tL3B5cGEvZ2V0LXBpcA&amp;ntb=1">get-pip.py</a></p>
+<p>generate_portable_python.py</p>
+<pre class="brush:py;auto-links:false;toolbar:false" contenteditable="false">import urllib.request
+import os
+ 
+dir_path = os.path.dirname(os.path.realpath(__file__))
+# basic files for Python installation
+# before 3.12.0
+#py_list = ["core", "dev", "exe", "lib", "tcltk", "tools"]
+# 3.12.0 no tools.msi
+py_list = ["core", "dev", "exe", "lib", "tcltk"]
+# Python version
+version = "3.12.0"
+# Python msi download URL
+ftp = "https://www.python.org/ftp/python/" + version + "/amd64/"
+# location for Portable Python
+path = "y:\\tmp\\Python312"
+# create directory
+try:
+    os.mkdir(path)
+except:
+    # path exists
+    pass
+# get Python installation msi files and extract into target dir
+for i in py_list:
+    filename = i + ".msi"
+    url = ftp + filename
+    # download basic python msi file
+    urllib.request.urlretrieve(url, filename)
+    os.system("msiexec.exe /a " + i + ".msi targetdir=" + path)
+    # delete msi file
+    os.remove(dir_path + "\\" + i + ".msi")</pre>
+<p></p><h3>SciTE</h3>
+<p>下載 <a href="https://www.scintilla.org/wscite540.zip">https://www.scintilla.org/wscite540.zip</a></p><h1>References</h1>
 <p>PMKS: <a href="https://github.com/DesignEngrLab/PMKS">https://github.com/DesignEngrLab/PMKS</a></p>
 <p>PMKS+:</p>
 <p style="padding-left: 30px;"><a href="https://app.pmksplus.com/">https://app.pmksplus.com/</a></p>

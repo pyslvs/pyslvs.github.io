@@ -2,7 +2,7 @@
         <head>
         <title>pyslvs</title>
         <meta charset="utf-8">
-<meta property="head" content="H2">
+<meta property="head" content="H1">
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
         <link href="https://fonts.googleapis.com/css?family=Quicksand:300,400,500,700,900" rel="stylesheet">
         <link rel="stylesheet" href="./../cmsimde/static/chimper/fonts/icomoon/style.css">
@@ -142,21 +142,16 @@ img.add_border {
           </div>
           
         </header>
-    <div id="tipue_search_content">Development << <a href='Development.html'>Previous</a> <a href='MCAD.html'>Next</a> >> MCAD<br /><h1>Pyinstaller</h1>
-<p>Under Pyslvs portable development environment, use the following batch file to generate standalone Pyslvs-UI/dist/Pyslvs.exe:</p>
-<p><a href="./../downloads/win_generate_exe.bat">win_generate_exe.bat</a></p>
-<pre class="brush:js;auto-links:false;toolbar:false" contenteditable="false">REM batch file to generate Pyslvs.exe
-set Disk=y
-
-for /f %%v in ('python -c "from pyslvs_ui import __version__;print(__version__)"') do set "PYSLVSVER=%%v"
-for /f %%v in ('python -c "import platform;print(''.join(platform.python_compiler().split()[:2]).replace('.', '').lower())"') do set "COMPILERVER=%%v"
-for /f %%v in ('python -c "import platform;print(platform.machine().lower())"') do set "SYSVER=%%v"
-set "EXENAME=pyslvs-%PYSLVSVER%.%COMPILERVER%-%SYSVER%"
-
-python -m PyInstaller -c -F "%Disk%:/tmp/Pyslvs-UI/scripts/entry.py" -n %EXENAME% -i "pyslvs_ui/icons/main.ico"  --add-data "pyslvs_ui/icons/*;pyslvs_ui/icons" --additional-hooks-dir "%Disk%:/tmp/Pyslvs-UI/scripts"</pre>
-<p>y:\tmp\Pyslvs-UI&gt;win_generate_exe.bat</p>
-<p></p>
-<br />Development << <a href='Development.html'>Previous</a> <a href='MCAD.html'>Next</a> >> MCAD</div>
+    <div id="tipue_search_content">Solid Edge << <a href='Solid Edge.html'>Previous</a> <a href='Windows.html'>Next</a> >> Windows<br /><h1>Tasks</h1>
+<p><a href="https://pyslvs.github.io">https://pyslvs.github.io</a> 的目標如下:</p>
+<ol>
+<li>簡化有關 Pyslvs-UI 在 Windows 64 位元操作系統中的開發流程</li>
+<li>將 Pyslvs-UI 的機構轉為 <a href="https://resources.sw.siemens.com/en-US/download-solid-edge-community-edition">Solid Edge Community Version</a> 零組件</li>
+<li>將 Pyslvs-UI 的機構轉為 <a href="https://www.coppeliarobotics.com/">CoppeliaSim</a> 與 <a href="https://cyberbotics.com/">Webots</a> 模擬場景</li>
+<li>將 Pyslvs-UI 的機構轉為 <a href="https://github.com/PMKS-Web/PMKSWeb">PMKSPlus</a> 網際系統格式</li>
+<li>將<a href="https://en.wikipedia.org/wiki/Reinforcement_learning">強化學習機制</a>導入 Pyslvs-UI 機構設計流程</li>
+</ol>
+<br />Solid Edge << <a href='Solid Edge.html'>Previous</a> <a href='Windows.html'>Next</a> >> Windows</div>
         
     <!-- footer -->
       <div class="container">

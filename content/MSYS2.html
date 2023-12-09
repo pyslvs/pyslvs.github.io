@@ -2,7 +2,7 @@
         <head>
         <title>pyslvs</title>
         <meta charset="utf-8">
-<meta property="head" content="H2">
+<meta property="head" content="H3">
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
         <link href="https://fonts.googleapis.com/css?family=Quicksand:300,400,500,700,900" rel="stylesheet">
         <link rel="stylesheet" href="./../cmsimde/static/chimper/fonts/icomoon/style.css">
@@ -142,21 +142,8 @@ img.add_border {
           </div>
           
         </header>
-    <div id="tipue_search_content">Development << <a href='Development.html'>Previous</a> <a href='MCAD.html'>Next</a> >> MCAD<br /><h1>Pyinstaller</h1>
-<p>Under Pyslvs portable development environment, use the following batch file to generate standalone Pyslvs-UI/dist/Pyslvs.exe:</p>
-<p><a href="./../downloads/win_generate_exe.bat">win_generate_exe.bat</a></p>
-<pre class="brush:js;auto-links:false;toolbar:false" contenteditable="false">REM batch file to generate Pyslvs.exe
-set Disk=y
-
-for /f %%v in ('python -c "from pyslvs_ui import __version__;print(__version__)"') do set "PYSLVSVER=%%v"
-for /f %%v in ('python -c "import platform;print(''.join(platform.python_compiler().split()[:2]).replace('.', '').lower())"') do set "COMPILERVER=%%v"
-for /f %%v in ('python -c "import platform;print(platform.machine().lower())"') do set "SYSVER=%%v"
-set "EXENAME=pyslvs-%PYSLVSVER%.%COMPILERVER%-%SYSVER%"
-
-python -m PyInstaller -c -F "%Disk%:/tmp/Pyslvs-UI/scripts/entry.py" -n %EXENAME% -i "pyslvs_ui/icons/main.ico"  --add-data "pyslvs_ui/icons/*;pyslvs_ui/icons" --additional-hooks-dir "%Disk%:/tmp/Pyslvs-UI/scripts"</pre>
-<p>y:\tmp\Pyslvs-UI&gt;win_generate_exe.bat</p>
-<p></p>
-<br />Development << <a href='Development.html'>Previous</a> <a href='MCAD.html'>Next</a> >> MCAD</div>
+    <div id="tipue_search_content">Windows << <a href='Windows.html'>Previous</a> <a href='GIT.html'>Next</a> >> GIT<br /><h1>MSYS2</h1>
+<p>下載 <a href="https://github.com/msys2/msys2-installer/releases/download/2023-10-26/msys2-x86_64-20231026.exe">https://github.com/msys2/msys2-installer/releases/download/2023-10-26/msys2-x86_64-20231026.exe</a> 之後, 解開壓縮檔案取得 msys64_20231026 目錄.</p><br />Windows << <a href='Windows.html'>Previous</a> <a href='GIT.html'>Next</a> >> GIT</div>
         
     <!-- footer -->
       <div class="container">
